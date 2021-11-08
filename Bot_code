@@ -1,0 +1,250 @@
+import asyncio
+import time
+import random
+import discord
+import sys as sys
+import numpy as nu
+import pandas as pd
+
+
+
+db = pd.read_csv (r'pokemon.csv')
+df = pd.DataFrame(db, columns= ['Name','Form','Type1','Type2'])
+
+pt=["Normal", "Fire", "Water", "Grass", "Electric", "Ice", "Fighting", "Poison", "Ground",
+    "Flying", "Psychic", "Bug", "Rock", "Ghost", "Dragon", "Dark", "Steel", "Fairy", "null"]
+
+
+
+
+
+token = "lmao get your own id"
+client = discord.Client()
+id = client.get_guild("lmao use your own server")
+
+
+
+@client.event
+async def on_message(message):
+    id = client.get_guild("use your own again")
+    channels = ["moderator-chat"]
+    if message.author == client.user:
+        return
+    message.content = message.content.lower()
+    args = message.content.split(" ")[1:]
+    valid_users = ["Put your discord id here"]  # Only users in this list can use commands
+
+    if message.content.find("hello there") != -1:
+        await message.channel.send("General Kenobi!")
+
+    if message.content.find("%") != -1:
+        if str(message.author) in valid_users:
+            print("you are mom")
+            if message.content.find("tour") != -1:
+                print("this works")
+                global tour
+                vgc = 1
+                OU = 2
+                Ubers = 3
+                lc = 4
+                nat = 5
+                mono = 6
+
+                tour = random.choice([vgc, vgc, vgc, vgc, vgc, OU, OU, Ubers, lc, nat, nat, mono])
+                if tour == OU:
+                    tnum = random.randrange(3, 9, 1)
+                    await message.channel.send(f"This week's tournament will be Gen {str(tnum)} OU.")
+                elif tour == vgc:
+                    tnum = random.randrange(9, 12, 1)
+                    await message.channel.send(f"This week's tournament will be VGC Series {str(tnum)}.")
+                elif tour == mono:
+                    tnum = random.randrange(3, 9, 1)
+                    await message.channel.send(f"This week's tournament will be Gen {str(tnum)} Mono Type VGC.")
+                elif tour == lc:
+                    await message.channel.send(f"This week's tournament will be Little Cup VGC.")
+                elif tour == Ubers:
+                    await message.channel.send(f"This week's tournament will be Gen 8 Ubers.")
+                elif tour == nat:
+                    await message.channel.send("This week's tournament will be Gen 8 Nat Dex VGC")
+
+            elif message.content.find("help") != -1:
+                print("help is on the way")
+                embed = discord.Embed(title="Command List (user)", description="Commands the average user can use.", Color=discord.Color.red())
+                embed.add_field(name="%help", value="Shows this page",inline=False)
+                embed.add_field(name="%matchpredict {player} {player}",
+                                value="Predicts the outcome of a match between two players",inline=False)
+                embed.add_field(name="%type", value="Coming Soon!",inline=False)
+                embed.add_field(name="%calc", value="Coming Soon!",inline=False)
+
+
+                embed=discord.Embed(title="Command List (Admin)", description="Commands that Admins can use.", Color=discord.Color.blue())
+                embed.add_field(name="%help", value="Shows this page",inline=False )
+                embed.add_field(name="%tour", value="Selects a random tournament format",inline=False)
+                await message.channel.send(content=None, embed=embed)
+
+
+
+        if message.content.find('predict') != -1:
+            a, b, c = message.content.split(' ', 3)
+            win = random.choice([b, c])
+            if win == b:
+                lose = c
+            elif win == c:
+                lose = b
+            wins = 2
+            loss = random.randrange(0,2,1)
+            if loss == 0:
+                diff = random.randrange(0,9,1)
+            else:
+                diff = random.choice([0,1,1,2,2,2,3,3,3,4,4,5])
+                if diff == 5:
+                    diff = "unknown(win on timer for at least 1 game)"
+            await message.channel.send(f"The results are:\n"
+                f"The winner will be: {win}\n"
+                                       f"The loser will be: {lose}\n"
+                                       f"The score will be {str(wins)}-{str(loss)} with a +{str(diff)} differential\n")
+
+        if message.content.find("help") != -1:
+            embed = discord.Embed(title="Command List (user)", description="Commands the average user can use.")
+            embed.add_field(name="%help", value="Shows this page",inline=False)
+            embed.add_field(name="%matchpredict {player} {player}", value="Predicts the outcome of a match between two players",inline=False)
+            embed.add_field(name="%type", value="Coming Soon!",inline=False)
+            embed.add_field(name="%calc", value="Coming Soon!",inline=False)
+            await message.channel.send(content=None, embed=embed)
+
+
+        if message.content.find("credits") != -1:
+            await message.channel.send(f'NINJOSH Faker v2 created and hosted by altconception.\n'
+                                       f'Type effectiveness calculator developed by e s t e r and ported to '
+                                       f'Discord API by altconception.\n'
+                                       f'Code aceessable on github at https://github.com/altconception/NINJOSH-Faker-v2.')
+
+
+        if message.content.find("type") != -1:
+            nmon = input('Number of Pokémon to consider:\n')
+            nmon = int(nmon)
+
+            team = []
+
+            for i in range(nmon):
+                team.append(input('Name of the Pokémon number'))
+
+            types = []
+            for j in range(nmon):
+                types.append([])
+                a = df[df['Name'] == team[j]]
+                if a.size != 4:
+                    a = a[a['Form'] == ' ']
+                if a.empty:
+                    a = df[df['Form'] == team[j]]
+                    if a.empty:
+                        sys.exit('This is not a Pokémon!')
+
+                b1 = a["Type1"]
+                b1 = b1.to_string(index=False)
+                types[j].append(b1)
+                b2 = a["Type2"]
+                b2 = b2.to_string(index=False)
+                if b2 == ' ':
+                    b2 = 'null'
+                types[j].append(b2)
+
+            effectiveness = [[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0.5, 0, 1, 1, 0.5, 0, 1],
+                             [1, 0.5, 0.5, 2, 1, 2, 1, 1, 1, 1, 1, 2, 0.5, 1, -1, 1, 2, 1, 1],
+                             [1, 2, 0.5, 0.5, 1, 1, 1, 1, 2, 1, 1, 1, 2, 1, 0.5, 1, 1, 1, 1],
+                             [1, 0.5, 2, 0.5, 1, 1, 1, 0.5, 2, 0.5, 1, 0.5, 2, 1, 0.5, 1, 0.5, 1, 1],
+                             [1, 1, 2, 0.5, 0.5, 1, 1, 1, 0, 2, 1, 1, 1, 1, 0.5, 1, 1, 1, 1],
+                             [1, 0.5, 0.5, 2, 1, 0.5, 1, 1, 2, 2, 1, 1, 1, 1, 2, 1, 0.5, 1, 1],
+                             [2, 1, 1, 1, 1, 2, 1, 0.5, 1, 0.5, -1, 0.5, 2, 0, 1, 2, 2, 0.5, 1],
+                             [1, 1, 1, 2, 1, 1, 1, 0.5, 0.5, 1, 1, 1, 0.5, 0.5, 1, 1, 0, 2, 1],
+                             [1, 2, 1, 0.5, 2, 1, 1, 2, 1, 0, 1, 0.5, 2, 1, 1, 1, 2, 1, 1],
+                             [1, 1, 1, 2, 0.5, 1, 2, 1, 1, 1, 1, 2, 0.5, 1, 1, 1, 0.5, 1, 1],
+                             [1, 1, 1, 1, 1, 1, 2, 2, 1, 1, 0.5, 1, 1, 1, 1, 0, 0.5, 1, 1],
+                             [1, 0.5, 1, 2, 1, 1, 0.5, 0.5, 1, 0.5, 2, 1, 1, 0.5, 1, 2, 0.5, 0.5, 1],
+                             [1, 2, 1, 1, 1, 2, 0.5, 1, 0.5, 2, 1, 2, 1, 1, 1, 1, 0.5, 1, 1],
+                             [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 2, 1, 0.5, 1, 1, 1],
+                             [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 0.5, 0, 1],
+                             [1, 1, 1, 1, 1, 1, 0.5, 1, 1, 1, 2, 1, 1, 2, 1, 0.5, 1, 0.5, 1],
+                             [1, 0.5, 0.5, 1, 0.5, 2, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 0.5, 2, 1],
+                             [1, 0.5, 1, 1, 1, 1, 2, 0.5, 1, 1, 1, 1, 1, 1, 2, 2, 0.5, 1, 1],
+                             [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]]
+            efftot = []
+            eff = []
+
+            # Calculate effectiveness matrix
+
+            for j in range(len(types)):
+                efftot.append([])
+                for i in range(len(pt)):
+                    for k in range(len(pt)):
+                        if types[j][1] == pt[k]:
+                            n = k
+                        if types[j][0] == pt[k]:
+                            m = k
+                    efftot[j].append(effectiveness[i][n] * (effectiveness[i][m]))
+            eff.append(efftot)
+
+            checkweakness = nu.zeros(18)
+            checkresistance = nu.zeros(18)
+            checkimmunity = nu.zeros(18)
+
+            for i in range(len(eff[0])):
+                for j in range(len(eff[0][i])):
+                    if eff[0][i][j] == 0:
+                        checkimmunity[j] = checkimmunity[j] + 1
+                    if eff[0][i][j] == 0.5:
+                        checkresistance[j] = checkresistance[j] + 1
+                    if eff[0][i][j] == 2:
+                        checkweakness[j] = checkweakness[j] + 1
+
+            immtot = 0
+            for j in range(len(checkimmunity)):
+                immtot = immtot + checkimmunity[j]
+
+            restot = 0
+            for j in range(len(checkresistance)):
+                restot = restot + checkresistance[j]
+
+            weatot = 0
+            for j in range(len(checkweakness)):
+                weatot = weatot + checkweakness[j]
+
+            for j in range(len(checkimmunity)):
+                if checkimmunity[j] != 0:
+                    print("The team has a total of", checkimmunity[j], "immunities to the", pt[j], "typing")
+            print("\n")
+            for j in range(len(checkweakness)):
+                if checkweakness[j] != 0:
+                    print("The team has a total of", checkweakness[j], "weaknesses to the", pt[j], "typing")
+            print("\n")
+            for j in range(len(checkresistance)):
+                if checkresistance[j] != 0:
+                    print("The team has a total of", checkresistance[j], "resistances to the", pt[j], "typing")
+
+            for j in range(len(checkimmunity)):
+                if (checkweakness[j] > 0 and checkimmunity[j] == 0) and (
+                        checkweakness[j] > 0 and checkresistance[j] == 0):
+                    print("The typing", pt[j], "is not covered")
+
+            for j in range(len(checkimmunity)):
+                if (checkweakness[j] - (checkresistance[j] + checkimmunity[j]) > 2):
+                    print("The typing", pt[j], "is only partially covered")
+
+            print("Total number of immunities:", immtot, "\nTotal number of resistances:", restot,
+                  "\nTotal number of weaknesses:", weatot)
+
+
+
+
+
+@client.event
+async def on_member_join(member):
+    await member.create_dm()
+    await member.dm_channel.send(
+        f'Hi {member.name}! Welcome to [insert server here]! I am this the custom discord bot for this sever, made by altconception!'
+        f' Feel free to ask [owner], any [admin role] role member (admins), or [mod role] member (moderators) any questions you have.'
+        f' We hope to see you in drafts, tournaments, or in any other activity we do!')
+
+
+client.run(token)
+
